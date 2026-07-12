@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>脓毒性休克液体复苏剂量风险计算器 | Septic shock fluid dose-risk calculator</title>
+
+<style>
+:root{
+  --ink:#17212b;
+  --muted:#627184;
+  --soft:#8795a8;
+  --line:#dbe3eb;
+  --line-strong:#c7d3df;
+  --bg:#f4f7f8;
+  --panel:#ffffff;
+  --blue:#245b69;
+  --teal:#2f8f88;
+  --purple:#745a96;
+  --red:#b85c49;
+  --gold:#b88746;
+  --focus:#2f8f88;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"Noto Sans SC","Microsoft YaHei",sans-serif;
+  color:var(--ink);
+  background:
+    linear-gradient(180deg,#eef5f5 0,#f7f9fb 360px,#f4f7f8 100%);
+}
+header{
+  position:relative;
+  overflow:hidden;
+  padding:30px 36px 26px;
+  color:#fff;
+  background:
+    linear-gradient(135deg,#19343d 0%,#245b69 44%,#2f8f88 100%);
+  border-bottom:1px solid rgba(255,255,255,.18);
+}
+header:after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(255,255,255,.75),rgba(255,255,255,.12));
+}
+.header-copy{position:relative;z-index:1;max-width:1120px;padding-right:132px}
+.brand-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:28px;
+  padding:6px 10px;
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  color:#eaf7f6;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:0;
+}
+h1{
+  max-width:960px;
+  margin:14px 0 0;
+  font-size:clamp(28px,4vw,48px);
+  line-height:1.08;
+  letter-spacing:0;
+}
+.subtitle{
+  max-width:940px;
+  margin-top:12px;
+  color:#d9eced;
+  font-size:15px;
+  line-height:1.65;
+}
+.hero-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:18px;
+}
+.hero-meta span{
+  min-height:32px;
+  padding:7px 10px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(255,255,255,.1);
+  color:#f3fbfb;
+  font-size:12px;
+  font-weight:700;
+}
+.lang-toggle{
+  position:absolute;
+  z-index:2;
+  right:28px;
+  top:28px;
+  min-width:74px;
+  min-height:36px;
+  border:1px solid rgba(255,255,255,.36);
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  padding:8px 13px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(3,23,31,.18);
+  backdrop-filter:blur(12px);
+}
+.lang-toggle:hover{background:rgba(255,255,255,.22)}
+.lang-toggle:focus-visible{outline:3px solid rgba(255,255,255,.72);outline-offset:2px}
+.shell{
+  display:grid;
+  grid-template-columns:minmax(300px,380px) minmax(0,1fr);
+  gap:20px;
+  width:min(1520px,100%);
+  margin:0 auto;
+  padding:22px;
+}
+.panel{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--line);
+  border-radius:8px;
+  box-shadow:0 14px 36px rgba(25,43,58,.08);
+}
+.inputs{
+  align-self:start;
+  position:sticky;
+  top:16px;
+  padding:18px;
+}
+.section-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:18px 0 10px;
+  color:#263747;
+  font-size:12px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:0;
+}
+.section-title:first-child{margin-top:2px}
+.section-title:before{
+  content:"";
+  width:7px;
+  height:18px;
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--teal),var(--blue));
+}
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+label{
+  display:block;
+  margin-bottom:6px;
+  color:#334457;
+  font-size:12px;
+  font-weight:700;
+}
+input,select{
+  width:100%;
+  min-height:40px;
+  border:1px solid #cbd7e3;
+  border-radius:8px;
+  padding:9px 10px;
+  color:#17212b;
+  background:#fbfdff;
+  font-size:13px;
+  outline:none;
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+input:focus,select:focus{
+  border-color:var(--focus);
+  box-shadow:0 0 0 3px rgba(47,143,136,.15);
+  background:#fff;
+}
+input[type=checkbox]{
+  width:16px;
+  min-height:16px;
+  margin:0 8px 0 0;
+  accent-color:var(--teal);
+}
+.check{
+  display:flex;
+  align-items:center;
+  min-height:38px;
+  margin:0;
+  padding:8px 9px;
+  border:1px solid #dce5ed;
+  border-radius:8px;
+  background:#fbfdff;
+  color:#334457;
+  font-size:12px;
+  font-weight:700;
+}
+.small{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.55;
+}
+.results{
+  display:grid;
+  gap:16px;
+  min-width:0;
+}
+.warning{
+  padding:13px 15px;
+  border:1px solid #e7c06a;
+  border-left:5px solid var(--gold);
+  border-radius:8px;
+  background:#fff9ec;
+  color:#644819;
+  font-size:12px;
+  line-height:1.55;
+}
+.topline{
+  display:grid;
+  grid-template-columns:minmax(0,1.02fr) minmax(360px,.98fr);
+  gap:16px;
+}
+.recommend{
+  position:relative;
+  overflow:hidden;
+  padding:20px;
+}
+.recommend:before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:5px;
+  background:linear-gradient(90deg,var(--teal),var(--blue),var(--purple));
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:32px;
+  padding:8px 11px;
+  border-radius:999px;
+  color:#fff;
+  font-size:12px;
+  font-weight:850;
+  background:var(--blue);
+  box-shadow:0 9px 18px rgba(36,91,105,.18);
+}
+.rec-title{
+  margin:16px 0 8px;
+  color:#132533;
+  font-size:clamp(26px,3vw,38px);
+  line-height:1.05;
+  font-weight:900;
+  letter-spacing:0;
+}
+.rec-text{
+  max-width:760px;
+  color:var(--muted);
+  line-height:1.58;
+  font-size:13px;
+}
+.metric-row{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1px;
+  margin-top:18px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--line);
+}
+.metric{
+  padding:13px 12px;
+  background:#fbfdff;
+}
+.metric span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:750;
+}
+.metric strong{
+  display:block;
+  margin-top:5px;
+  color:#182637;
+  font-size:22px;
+  line-height:1;
+}
+.chart-panel{padding:16px}
+.chart-title{
+  margin-bottom:10px;
+  color:#253344;
+  font-size:14px;
+  font-weight:850;
+}
+svg{display:block;width:100%;height:auto}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(180px,1fr));
+  gap:12px;
+}
+.dose-card{
+  padding:15px;
+  border-top:5px solid var(--blue);
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+}
+.dose-card.is-chosen{
+  box-shadow:0 18px 38px rgba(36,91,105,.16);
+  transform:translateY(-1px);
+}
+.dose-card h3{
+  min-height:42px;
+  margin:0 0 12px;
+  color:#1d2c3a;
+  font-size:15px;
+  line-height:1.35;
+  font-weight:850;
+}
+.risk{margin:10px 0}
+.risk-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:5px;
+  color:#344557;
+  font-size:11px;
+  line-height:1.3;
+}
+.risk-row strong{white-space:nowrap}
+.bar{
+  height:8px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#e8eef3;
+}
+.fill{
+  height:100%;
+  border-radius:999px;
+}
+.support{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.45;
+}
+@media(max-width:1180px){
+  .shell{grid-template-columns:1fr}
+  .inputs{position:static}
+  .topline{grid-template-columns:1fr}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:680px){
+  header{padding:20px 18px 22px}
+  .header-copy{padding-right:0;padding-top:44px}
+  h1{font-size:30px}
+  .subtitle{font-size:14px}
+  .lang-toggle{left:18px;right:auto;top:16px}
+  .shell{padding:12px}
+  .grid2,.metric-row,.cards{grid-template-columns:1fr}
+  .topline{gap:12px}
+  .rec-title{font-size:27px}
+}
+</style>
+</head>
+<body>
+<header><button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">EN</button><div class="header-copy"><div class="brand-kicker" id="brandKicker">Research calculator</div><h1 id="pageTitle">Septic shock fluid dose-risk calculator</h1><div class="subtitle" id="pageSubtitle">Enter baseline patient variables to estimate counterfactual risks under four early crystalloid dose ranges. The tool suggests the supported range with the lowest composite harm. This retrospective MIMIC-IV exploratory model is for research visualization only.</div><div class="hero-meta"><span id="metaSample">Training sample n=2,829</span><span id="metaModel">MIMIC-IV exploratory model</span><span id="metaUse">Research visualization only</span></div></div></header>
+<main class="shell">
+<aside class="panel inputs">
+<div class="section-title">Baseline</div><div class="grid2"><div><label>Age</label><input id="age" type="number" min="18" max="100" step="1"></div><div><label>Sex</label><select id="male"><option value="1">Male</option><option value="0">Female</option></select></div></div>
+<div class="grid2" style="margin-top:10px"><div><label>Race group</label><select id="race_group"><option value="OTHER" >OTHER</option>
+<option value="ASIAN" >ASIAN</option>
+<option value="BLACK" >BLACK</option>
+<option value="HISPANIC" >HISPANIC</option>
+<option value="WHITE" selected>WHITE</option></select></div><div><label>LVEF phenotype</label><select id="lvef_phenotype_unknown"><option value="Unknown" selected>Unknown</option>
+<option value="HFmrEF_40_49" >HFmrEF_40_49</option>
+<option value="HFrEF_lt40" >HFrEF_lt40</option>
+<option value="Normal_LVEF_ge50" >Normal_LVEF_ge50</option></select></div></div>
+<div class="section-title">Shock severity</div><div class="grid2"><div><label>SOFA score</label><input id="sofa_score" type="number" min="0" max="24" step="1"></div><div><label>Respiratory SOFA</label><input id="respiration" type="number" min="0" max="4" step="1"></div><div><label>Lactate, mmol/L</label><input id="lactate_max_around_vaso" type="number" min="0" max="30" step="0.1"></div><div><label>Lowest MAP, mmHg</label><input id="meanbp_min" type="number" min="20" max="120" step="1"></div></div>
+<div class="section-title">Comorbidity and tolerance</div><div class="grid2"><label class="check"><input id="heart_failure_icd" type="checkbox">Heart failure</label><label class="check"><input id="ckd_icd_history_through_hadm" type="checkbox">CKD</label><label class="check"><input id="copd_icd_history_through_hadm" type="checkbox">COPD</label><label class="check"><input id="diabetes_icd_history_through_hadm" type="checkbox">Diabetes</label><label class="check"><input id="cad_icd_history_through_hadm" type="checkbox">Coronary artery disease</label><label class="check"><input id="atrial_fibrillation_icd_history_through_hadm" type="checkbox">Atrial fibrillation</label><label class="check"><input id="hypoalbumin_lt3" type="checkbox">Albumin &lt;3 g/dL</label><label class="check"><input id="renal_vulnerability" type="checkbox">Renal vulnerability</label></div><label class="check" style="margin-top:8px"><input id="echo_vulnerability_no_resp_high" type="checkbox">Higher ECHO/cardiorenal vulnerability</label><div class="small" style="margin-top:10px">Training sample n=2,829. A candidate range is considered supported only when propensity >= 0.03.</div>
+</aside>
+<section class="results"><div class="warning">Research-use warning: outputs are candidate dose ranges and risk visualization, not bedside orders. Prospective validation, calibration and safety evaluation are required before clinical use.</div><div class="topline"><div class="panel recommend"><div class="badge" id="supportBadge">Calculating</div><div class="rec-title" id="recTitle">-</div><div class="rec-text" id="recText"></div><div class="metric-row"><div class="metric"><span>Composite harm</span><strong id="recHarm">-</strong></div><div class="metric"><span>Benefit vs 30-45</span><strong id="benefit">-</strong></div><div class="metric"><span>Support probability</span><strong id="supportProb">-</strong></div></div></div><div class="panel chart-panel"><div class="chart-title">Composite harm across dose ranges</div><div id="harmChart"></div></div></div><div class="cards" id="doseCards"></div><div class="panel chart-panel"><div class="chart-title">Outcome-specific risks</div><div id="riskChart"></div></div></section>
+</main>
+<script>
+const MODEL={"created_at": "2026-07-12T12:30:01", "n": 2829, "dose_labels": ["<30", "30-45", "45-60", ">60"], "dose_titles": {"<30": "Low dose <30 mL/kg", "30-45": "Standard dose 30-45 mL/kg", "45-60": "Intermediate-high dose 45-60 mL/kg", ">60": "High dose >60 mL/kg"}, "propensity_min": 0.03, "race_levels": ["OTHER", "ASIAN", "BLACK", "HISPANIC", "WHITE"], "lvef_levels": ["Unknown", "HFmrEF_40_49", "HFrEF_lt40", "Normal_LVEF_ge50"], "outcomes": {"death_28d": {"label": "28-day mortality", "weight": 1.0}, "invasive_vent_0_24h": {"label": "24-h ventilation", "weight": 0.4}, "aki_or_crrt_0_48h": {"label": "48-h AKI/CRRT", "weight": 0.35}, "oliguria_main_0_24h": {"label": "24-h oliguria", "weight": 0.25}}, "defaults": {"age": 66, "male": 1, "race_group": "WHITE", "sofa_score": 12, "respiration": 3, "lactate_max_around_vaso": 3.6, "meanbp_min": 55.0, "heart_failure_icd": 0, "ckd_icd_history_through_hadm": 0, "copd_icd_history_through_hadm": 0, "diabetes_icd_history_through_hadm": 0, "cad_icd_history_through_hadm": 0, "atrial_fibrillation_icd_history_through_hadm": 0, "hypoalbumin_lt3": 0, "renal_vulnerability": 1, "lvef_phenotype_unknown": "Unknown", "echo_vulnerability_no_resp_high": 0}, "models": {"outcomes": {"death_28d": {"coef": {"Intercept": -3.7309397194715723, "age_per10": 0.22752817940491646, "male": -0.14593739289068713, "sofa_score": 0.15200789641429127, "respiration": -0.08401908750003823, "lactate_max_around_vaso": 0.10587250412025517, "meanbp_min": -0.009966022491657598, "heart_failure_icd": 0.022279182764004, "ckd_icd_history_through_hadm": -0.09078741675935323, "copd_icd_history_through_hadm": 0.34095410289643174, "diabetes_icd_history_through_hadm": -0.15778244497933494, "cad_icd_history_through_hadm": -0.2798407297307334, "atrial_fibrillation_icd_history_through_hadm": 0.14239966165494206, "hypoalbumin_lt3": 0.3464725282395861, "renal_vulnerability": 0.3678437334592869, "age_ge75": -0.029199275018621323, "echo_vulnerability_no_resp_high": 0.2782880404836514, "race__ASIAN": -0.4871097282045654, "race__BLACK": -0.18661873058739467, "race__HISPANIC": -0.5579013111651212, "race__WHITE": -0.2966002802309764, "lvef__HFmrEF_40_49": -0.27195466370000937, "lvef__HFrEF_lt40": 0.30890443712448984, "lvef__Normal_LVEF_ge50": -0.13564943771721172, "dose__30-45": -0.5642304833369635, "dose__30-45__x__age_ge75": -0.28609920023808977, "dose__30-45__x__heart_failure_icd": -0.12821449520103223, "dose__30-45__x__ckd_icd_history_through_hadm": 0.5377395424053515, "dose__30-45__x__echo_vulnerability_no_resp_high": 0.18444701811759392, "dose__45-60": -0.3653278481580629, "dose__45-60__x__age_ge75": 0.022458916031557363, "dose__45-60__x__heart_failure_icd": 0.17470664020488869, "dose__45-60__x__ckd_icd_history_through_hadm": -0.13030109456278338, "dose__45-60__x__echo_vulnerability_no_resp_high": -1.047975232198183, "dose__>60": -0.9241727822028016, "dose__>60__x__age_ge75": 0.2606160920872418, "dose__>60__x__heart_failure_icd": 0.05850116480950482, "dose__>60__x__ckd_icd_history_through_hadm": 0.25211906324723254, "dose__>60__x__echo_vulnerability_no_resp_high": -0.08640227684023953}, "n": 2829, "events": 765, "aic": 2867.0137092616274, "brier": 0.16233029591035236}, "invasive_vent_0_24h": {"coef": {"Intercept": -3.3593849765371036, "age_per10": -0.05615935605780524, "male": -0.02741664129858399, "sofa_score": 0.1972162116492145, "respiration": 1.1186967634760814, "lactate_max_around_vaso": -0.011998932908278099, "meanbp_min": 0.02178985967869353, "heart_failure_icd": -0.143619011821583, "ckd_icd_history_through_hadm": -0.1875912584365927, "copd_icd_history_through_hadm": -0.08027748015084782, "diabetes_icd_history_through_hadm": -0.1928844722985988, "cad_icd_history_through_hadm": 0.04746029344031363, "atrial_fibrillation_icd_history_through_hadm": 0.1896521808641261, "hypoalbumin_lt3": -0.5537639250825394, "renal_vulnerability": -0.7136603397486686, "age_ge75": -0.14397566274701887, "echo_vulnerability_no_resp_high": 0.2398225176205413, "race__ASIAN": 0.049987191147516014, "race__BLACK": -0.38335155985195024, "race__HISPANIC": -0.4605726215438152, "race__WHITE": -0.3680086563902412, "lvef__HFmrEF_40_49": 0.13241939918632809, "lvef__HFrEF_lt40": -0.032532447215856075, "lvef__Normal_LVEF_ge50": 0.29332832859995467, "dose__30-45": 0.7960792542305319, "dose__30-45__x__age_ge75": -0.19963615382169123, "dose__30-45__x__heart_failure_icd": -0.7990579035220283, "dose__30-45__x__ckd_icd_history_through_hadm": 1.0580692932899107, "dose__30-45__x__echo_vulnerability_no_resp_high": 0.16841374197613523, "dose__45-60": 1.0237453574500766, "dose__45-60__x__age_ge75": -0.2849802430799512, "dose__45-60__x__heart_failure_icd": 0.056265640241933236, "dose__45-60__x__ckd_icd_history_through_hadm": 0.654848893330983, "dose__45-60__x__echo_vulnerability_no_resp_high": -0.17478730048425398, "dose__>60": 1.3909283016269347, "dose__>60__x__age_ge75": 0.13422966622611537, "dose__>60__x__heart_failure_icd": 0.5197359460388696, "dose__>60__x__ckd_icd_history_through_hadm": 0.26456442058796054, "dose__>60__x__echo_vulnerability_no_resp_high": -0.3155427099662601}, "n": 2829, "events": 2154, "aic": 1678.759528746821, "brier": 0.08697473955755866}, "aki_or_crrt_0_48h": {"coef": {"Intercept": -2.480527450839873, "age_per10": -0.0359773779582911, "male": 0.09028964415591247, "sofa_score": 0.14455005098445337, "respiration": -0.021855554323659956, "lactate_max_around_vaso": 0.12743882803014475, "meanbp_min": -0.006561393688135269, "heart_failure_icd": 0.06974644620698649, "ckd_icd_history_through_hadm": 0.13945794865658698, "copd_icd_history_through_hadm": -0.1483552725267456, "diabetes_icd_history_through_hadm": 0.01875008360444986, "cad_icd_history_through_hadm": 0.0014921612781424432, "atrial_fibrillation_icd_history_through_hadm": 0.09619338496783886, "hypoalbumin_lt3": -0.05145193685168515, "renal_vulnerability": 0.9958291741235177, "age_ge75": -0.031714280155940376, "echo_vulnerability_no_resp_high": 0.38374823932124374, "race__ASIAN": -0.2032071634975149, "race__BLACK": -0.1387795781428351, "race__HISPANIC": -0.011928588589193191, "race__WHITE": -0.04072063321890946, "lvef__HFmrEF_40_49": -0.17075394051194778, "lvef__HFrEF_lt40": 0.28927675027071836, "lvef__Normal_LVEF_ge50": 0.2636747085308203, "dose__30-45": -0.2854104814174781, "dose__30-45__x__age_ge75": 0.09693920717830193, "dose__30-45__x__heart_failure_icd": 0.41361020680701965, "dose__30-45__x__ckd_icd_history_through_hadm": 0.19380860070734832, "dose__30-45__x__echo_vulnerability_no_resp_high": -0.7732846692258216, "dose__45-60": 0.05232707599612846, "dose__45-60__x__age_ge75": -0.10097311095183036, "dose__45-60__x__heart_failure_icd": 0.1164111598883169, "dose__45-60__x__ckd_icd_history_through_hadm": -0.11485463737944346, "dose__45-60__x__echo_vulnerability_no_resp_high": -0.7310503706322152, "dose__>60": -0.1053125818533663, "dose__>60__x__age_ge75": -0.04664178415299832, "dose__>60__x__heart_failure_icd": -0.32284105114792594, "dose__>60__x__ckd_icd_history_through_hadm": -0.13755522081890592, "dose__>60__x__echo_vulnerability_no_resp_high": -0.13903995850841794}, "n": 2829, "events": 1295, "aic": 3276.18354601406, "brier": 0.19039918545131176}, "oliguria_main_0_24h": {"coef": {"Intercept": -3.9753389516921214, "age_per10": 0.16801909241176777, "male": -0.23451470494689694, "sofa_score": 0.2287729613776917, "respiration": -0.27387563985201085, "lactate_max_around_vaso": 0.0638910445880543, "meanbp_min": -0.007840368274481034, "heart_failure_icd": -0.050017176089855286, "ckd_icd_history_through_hadm": -0.14576070398724036, "copd_icd_history_through_hadm": 0.2739668892897287, "diabetes_icd_history_through_hadm": 0.03933320388681038, "cad_icd_history_through_hadm": -0.05588578342360211, "atrial_fibrillation_icd_history_through_hadm": 0.0456026181178078, "hypoalbumin_lt3": 0.45491549869951603, "renal_vulnerability": 1.4247554091395922, "age_ge75": -0.37642725367098734, "echo_vulnerability_no_resp_high": 0.09227204477871359, "race__ASIAN": -0.7416335217472876, "race__BLACK": 0.2413905985167174, "race__HISPANIC": -0.36690936717448003, "race__WHITE": -0.017765797847875027, "lvef__HFmrEF_40_49": -0.2841862253315969, "lvef__HFrEF_lt40": -0.1703264530229967, "lvef__Normal_LVEF_ge50": 0.13431943052647452, "dose__30-45": -0.6881530598206073, "dose__30-45__x__age_ge75": 0.42298752515434096, "dose__30-45__x__heart_failure_icd": 0.3792652337148404, "dose__30-45__x__ckd_icd_history_through_hadm": 0.630607380549368, "dose__30-45__x__echo_vulnerability_no_resp_high": -0.7504016579516872, "dose__45-60": -0.7837694122551717, "dose__45-60__x__age_ge75": 0.4462603714698264, "dose__45-60__x__heart_failure_icd": 0.7638981450193801, "dose__45-60__x__ckd_icd_history_through_hadm": -0.036532789856028425, "dose__45-60__x__echo_vulnerability_no_resp_high": -0.41379606794014046, "dose__>60": -0.9519054726297527, "dose__>60__x__age_ge75": 0.2705258126842794, "dose__>60__x__heart_failure_icd": 0.3288869267598861, "dose__>60__x__ckd_icd_history_through_hadm": 0.07084085458853583, "dose__>60__x__echo_vulnerability_no_resp_high": -0.11277234269680299}, "n": 2829, "events": 1055, "aic": 2875.078036064895, "brier": 0.1617918349327755}}, "propensity": {"<30": {"coef": {"Intercept": -1.2195743678238442, "age_per10": -0.04020086952173435, "male": 0.07533702289952526, "sofa_score": 0.06284034651799483, "respiration": -0.12387039040380785, "lactate_max_around_vaso": -0.08353192686309785, "meanbp_min": 0.005826096340838113, "heart_failure_icd": 0.7129199170961725, "ckd_icd_history_through_hadm": 0.1608867015419968, "copd_icd_history_through_hadm": 0.008103945195922595, "diabetes_icd_history_through_hadm": 0.04842961742992499, "cad_icd_history_through_hadm": 0.11516977214433861, "atrial_fibrillation_icd_history_through_hadm": 0.17942211164791416, "hypoalbumin_lt3": 0.035838732798736325, "renal_vulnerability": 0.22837914127881084, "age_ge75": -0.2875035661317833, "echo_vulnerability_no_resp_high": 0.2710306471824748, "race__ASIAN": -0.6030969759318588, "race__BLACK": 0.14472576240394905, "race__HISPANIC": -0.23097020038478477, "race__WHITE": -0.10075872690339432, "lvef__HFmrEF_40_49": 0.18363021060649876, "lvef__HFrEF_lt40": 0.575843182139286, "lvef__Normal_LVEF_ge50": -0.18636823326852914}, "n": 2829, "events": 1055, "aic": 3476.445380192248, "brier": 0.2086393320260765}, "30-45": {"coef": {"Intercept": -1.672070794773612, "age_per10": -0.015930317084446304, "male": 0.11641119947935678, "sofa_score": -0.031027695731135993, "respiration": 0.07965629423447147, "lactate_max_around_vaso": -0.03760034882169578, "meanbp_min": 0.0006749504646149052, "heart_failure_icd": -0.1465680310770618, "ckd_icd_history_through_hadm": 0.05029868141550004, "copd_icd_history_through_hadm": 0.02304517298498084, "diabetes_icd_history_through_hadm": 0.27456392156808357, "cad_icd_history_through_hadm": 0.010106226688485462, "atrial_fibrillation_icd_history_through_hadm": -0.1929511194462104, "hypoalbumin_lt3": 0.10543974497253669, "renal_vulnerability": 0.1959766785046659, "age_ge75": 0.06252688441633632, "echo_vulnerability_no_resp_high": -0.11901725720313984, "race__ASIAN": 0.09648474973523338, "race__BLACK": 0.21777068976943975, "race__HISPANIC": 0.06115059802339713, "race__WHITE": 0.12227409731510955, "lvef__HFmrEF_40_49": -0.13157444617527586, "lvef__HFrEF_lt40": -0.16586106047083898, "lvef__Normal_LVEF_ge50": -0.16220149033782802}, "n": 2829, "events": 378, "aic": 2248.647368674594, "brier": 0.1147442125797572}, "45-60": {"coef": {"Intercept": -2.047359156639697, "age_per10": 0.1405814814407604, "male": 0.10408802579490559, "sofa_score": -0.04381695563915721, "respiration": 0.09218368540308444, "lactate_max_around_vaso": 0.021910700871536445, "meanbp_min": -0.002324350465425283, "heart_failure_icd": -0.21448567082975029, "ckd_icd_history_through_hadm": -0.13748829508232793, "copd_icd_history_through_hadm": -0.1986967051436191, "diabetes_icd_history_through_hadm": 0.10937944397008706, "cad_icd_history_through_hadm": -0.07850454379152476, "atrial_fibrillation_icd_history_through_hadm": 0.017983775325827994, "hypoalbumin_lt3": -0.17066154916586135, "renal_vulnerability": 0.0074469158691610506, "age_ge75": -0.3067372615209877, "echo_vulnerability_no_resp_high": -0.16447407672531641, "race__ASIAN": -0.1458130288372458, "race__BLACK": -0.16504601589993964, "race__HISPANIC": 0.12117091856163734, "race__WHITE": -0.1000824371650338, "lvef__HFmrEF_40_49": -0.1769834606931353, "lvef__HFrEF_lt40": -0.2665899030504279, "lvef__Normal_LVEF_ge50": 0.06339788470737684}, "n": 2829, "events": 413, "aic": 2363.597127251285, "brier": 0.12308521255593176}, ">60": {"coef": {"Intercept": 0.05809406854904936, "age_per10": -0.029879893447652493, "male": -0.20077576989333706, "sofa_score": -0.01987893132359349, "respiration": 0.028544392406375796, "lactate_max_around_vaso": 0.08119245593797304, "meanbp_min": -0.004789996206986419, "heart_failure_icd": -0.5351769431088291, "ckd_icd_history_through_hadm": -0.17174598213963996, "copd_icd_history_through_hadm": 0.0937277718569721, "diabetes_icd_history_through_hadm": -0.2811421570086419, "cad_icd_history_through_hadm": -0.07668194934658888, "atrial_fibrillation_icd_history_through_hadm": -0.09939055959568129, "hypoalbumin_lt3": 0.00032098763120571775, "renal_vulnerability": -0.3148652428508374, "age_ge75": 0.4408753614150751, "echo_vulnerability_no_resp_high": -0.15116511489526482, "race__ASIAN": 0.5532136702523563, "race__BLACK": -0.18140843842277696, "race__HISPANIC": 0.11922593202920198, "race__WHITE": 0.09473479350983315, "lvef__HFmrEF_40_49": -0.05588073509135453, "lvef__HFrEF_lt40": -0.6590307465512601, "lvef__Normal_LVEF_ge50": 0.23615597495305343}, "n": 2829, "events": 983, "aic": 3461.4948480228286, "brier": 0.20857964131316303}}, "outcome_features": ["Intercept", "age_per10", "male", "sofa_score", "respiration", "lactate_max_around_vaso", "meanbp_min", "heart_failure_icd", "ckd_icd_history_through_hadm", "copd_icd_history_through_hadm", "diabetes_icd_history_through_hadm", "cad_icd_history_through_hadm", "atrial_fibrillation_icd_history_through_hadm", "hypoalbumin_lt3", "renal_vulnerability", "age_ge75", "echo_vulnerability_no_resp_high", "race__ASIAN", "race__BLACK", "race__HISPANIC", "race__WHITE", "lvef__HFmrEF_40_49", "lvef__HFrEF_lt40", "lvef__Normal_LVEF_ge50", "dose__30-45", "dose__30-45__x__age_ge75", "dose__30-45__x__heart_failure_icd", "dose__30-45__x__ckd_icd_history_through_hadm", "dose__30-45__x__echo_vulnerability_no_resp_high", "dose__45-60", "dose__45-60__x__age_ge75", "dose__45-60__x__heart_failure_icd", "dose__45-60__x__ckd_icd_history_through_hadm", "dose__45-60__x__echo_vulnerability_no_resp_high", "dose__>60", "dose__>60__x__age_ge75", "dose__>60__x__heart_failure_icd", "dose__>60__x__ckd_icd_history_through_hadm", "dose__>60__x__echo_vulnerability_no_resp_high"], "propensity_features": ["Intercept", "age_per10", "male", "sofa_score", "respiration", "lactate_max_around_vaso", "meanbp_min", "heart_failure_icd", "ckd_icd_history_through_hadm", "copd_icd_history_through_hadm", "diabetes_icd_history_through_hadm", "cad_icd_history_through_hadm", "atrial_fibrillation_icd_history_through_hadm", "hypoalbumin_lt3", "renal_vulnerability", "age_ge75", "echo_vulnerability_no_resp_high", "race__ASIAN", "race__BLACK", "race__HISPANIC", "race__WHITE", "lvef__HFmrEF_40_49", "lvef__HFrEF_lt40", "lvef__Normal_LVEF_ge50"]}, "empirical": {"dose_summary": [{"dose_range": "<30", "n": 1055, "death_28d": 0.3469194312796208, "ventilation": 0.6530805687203791, "aki_crrt": 0.5165876777251185, "oliguria": 0.46350710900473935, "composite": 0.9048341232227488}, {"dose_range": "30-45", "n": 378, "death_28d": 0.24338624338624337, "ventilation": 0.7645502645502645, "aki_crrt": 0.43386243386243384, "oliguria": 0.37037037037037035, "composite": 0.7936507936507936}, {"dose_range": "45-60", "n": 413, "death_28d": 0.2397094430992736, "ventilation": 0.8062953995157385, "aki_crrt": 0.4430992736077482, "oliguria": 0.3341404358353511, "composite": 0.8008474576271186}, {"dose_range": ">60", "n": 983, "death_28d": 0.2115971515768057, "ventilation": 0.8575788402848423, "aki_crrt": 0.40996948118006105, "oliguria": 0.29298067141403866, "composite": 0.7713631739572736}]}, "warning": "Exploratory retrospective model. Use for research visualization only, not bedside prescription."};const COLORS={"<30":"#7A9E9F","30-45":"#2E5E73","45-60":"#8064A2",">60":"#B85C49"};const I18N={
+  en:{lang:"en",toggle:"中文",title:"Septic shock fluid dose-risk calculator",pageTitle:"Septic shock fluid dose-risk calculator",subtitle:"Enter baseline patient variables to estimate counterfactual risks under four early crystalloid dose ranges. The tool suggests the supported range with the lowest composite harm. This retrospective MIMIC-IV exploratory model is for research visualization only.",sections:["Baseline","Shock severity","Comorbidity and tolerance"],labels:{age:"Age",male:"Sex",race_group:"Race group",lvef_phenotype_unknown:"LVEF phenotype",sofa_score:"SOFA score",respiration:"Respiratory SOFA",lactate_max_around_vaso:"Lactate, mmol/L",meanbp_min:"Lowest MAP, mmHg",heart_failure_icd:"Heart failure",ckd_icd_history_through_hadm:"CKD",copd_icd_history_through_hadm:"COPD",diabetes_icd_history_through_hadm:"Diabetes",cad_icd_history_through_hadm:"Coronary artery disease",atrial_fibrillation_icd_history_through_hadm:"Atrial fibrillation",hypoalbumin_lt3:"Albumin <3 g/dL",renal_vulnerability:"Renal vulnerability",echo_vulnerability_no_resp_high:"Higher ECHO/cardiorenal vulnerability"},selects:{male:["Male","Female"],race_group:{OTHER:"OTHER",ASIAN:"ASIAN",BLACK:"BLACK",HISPANIC:"HISPANIC",WHITE:"WHITE"},lvef_phenotype_unknown:{Unknown:"Unknown",HFmrEF_40_49:"HFmrEF 40-49",HFrEF_lt40:"HFrEF <40",Normal_LVEF_ge50:"Normal LVEF >=50"}},small:"Training sample n=2,829. A candidate range is considered supported only when propensity >= 0.03.",warning:"Research-use warning: outputs are candidate dose ranges and risk visualization, not bedside orders. Prospective validation, calibration and safety evaluation are required before clinical use.",metrics:["Composite harm","Benefit vs 30-45","Support probability"],charts:{harm:"Composite harm across dose ranges",risk:"Outcome-specific risks",lower:"lower is better"},doseTitles:{"<30":"Low dose <30 mL/kg","30-45":"Standard dose 30-45 mL/kg","45-60":"Intermediate-high dose 45-60 mL/kg",">60":"High dose >60 mL/kg"},outcomes:{death_28d:"28-day mortality",invasive_vent_0_24h:"24-h ventilation",aki_or_crrt_0_48h:"48-h AKI/CRRT",oliguria_main_0_24h:"24-h oliguria"},supported:"Supported candidate range",limited:"Limited support, interpret cautiously",recText:function(change){return "This range has the lowest estimated composite harm. Compared with a fixed 30-45 mL/kg strategy, estimated composite harm changes by "+change+" percentage points."},marks:{candidate:"Candidate recommendation",supported:"Supported",limited:"Limited support"},support:"propensity",harm:"harm",benefitUnit:" pct",calculating:"Calculating"},
+  zh:{lang:"zh-CN",toggle:"EN",title:"脓毒性休克液体复苏剂量风险计算器",pageTitle:"脓毒性休克液体复苏剂量风险计算器",subtitle:"输入患者基线变量，估计四个早期晶体液剂量范围下的反事实风险。工具会在有数据支持的剂量范围中，推荐估计综合伤害最低的候选范围。本 MIMIC-IV 回顾性探索模型仅用于科研可视化。",sections:["基线信息","休克严重程度","合并症与液体耐受性"],labels:{age:"年龄",male:"性别",race_group:"种族/族群",lvef_phenotype_unknown:"LVEF 表型",sofa_score:"SOFA 评分",respiration:"呼吸 SOFA",lactate_max_around_vaso:"乳酸，mmol/L",meanbp_min:"最低 MAP，mmHg",heart_failure_icd:"心力衰竭",ckd_icd_history_through_hadm:"慢性肾病",copd_icd_history_through_hadm:"COPD",diabetes_icd_history_through_hadm:"糖尿病",cad_icd_history_through_hadm:"冠状动脉疾病",atrial_fibrillation_icd_history_through_hadm:"心房颤动",hypoalbumin_lt3:"白蛋白 <3 g/dL",renal_vulnerability:"肾脏易损性",echo_vulnerability_no_resp_high:"较高超声/心肾易损性"},selects:{male:["男","女"],race_group:{OTHER:"其他",ASIAN:"亚洲人",BLACK:"黑人",HISPANIC:"西班牙裔",WHITE:"白人"},lvef_phenotype_unknown:{Unknown:"未知",HFmrEF_40_49:"HFmrEF 40-49",HFrEF_lt40:"HFrEF <40",Normal_LVEF_ge50:"正常 LVEF >=50"}},small:"训练样本 n=2,829。仅当倾向概率 >= 0.03 时，该候选剂量范围被视为有数据支持。",warning:"科研用途提示：输出为候选剂量范围和风险可视化，不是床旁医嘱。临床使用前需要前瞻性验证、校准与安全性评估。",metrics:["综合伤害","相对 30-45 的获益","支持概率"],charts:{harm:"不同剂量范围的综合伤害",risk:"各结局风险",lower:"越低越好"},doseTitles:{"<30":"低剂量 <30 mL/kg","30-45":"标准剂量 30-45 mL/kg","45-60":"中高剂量 45-60 mL/kg",">60":"高剂量 >60 mL/kg"},outcomes:{death_28d:"28 天死亡",invasive_vent_0_24h:"24 小时机械通气",aki_or_crrt_0_48h:"48 小时 AKI/CRRT",oliguria_main_0_24h:"24 小时少尿"},supported:"有数据支持的候选范围",limited:"支持有限，请谨慎解读",recText:function(change){return "该范围的估计综合伤害最低。与固定 30-45 mL/kg 策略相比，估计综合伤害变化 "+change+" 个百分点。"},marks:{candidate:"候选推荐",supported:"有数据支持",limited:"支持有限"},support:"倾向概率",harm:"综合伤害",benefitUnit:" 个百分点",calculating:"计算中"}
+};
+let currentLang=localStorage.getItem("fluidCalcLang")||"zh";
+const UI_EXTRA={
+  en:{brandKicker:"Research calculator",metaSample:"Training sample n=2,829",metaModel:"MIMIC-IV exploratory model",metaUse:"Research visualization only"},
+  zh:{brandKicker:"科研风险计算器",metaSample:"训练样本 n=2,829",metaModel:"MIMIC-IV 探索模型",metaUse:"仅用于科研可视化"}
+};
+function copy(){return I18N[currentLang]||I18N.zh}
+function extraCopy(){return UI_EXTRA[currentLang]||UI_EXTRA.zh}
+function updateLabelForInput(id,text){const input=el(id);if(!input)return;const label=input.closest("label")||document.querySelector(`label[for="${id}"]`)||input.parentElement?.querySelector("label");if(!label)return;if(label.classList.contains("check")){for(const node of Array.from(label.childNodes)){if(node.nodeType===Node.TEXT_NODE)node.textContent=""}label.appendChild(document.createTextNode(text));}else label.textContent=text}
+function updateSelect(id,labels){const node=el(id);if(!node)return;if(Array.isArray(labels)){Array.from(node.options).forEach((option,index)=>{if(labels[index])option.textContent=labels[index]})}else{Array.from(node.options).forEach(option=>{if(labels[option.value])option.textContent=labels[option.value]})}}
+function translatedOutcome(key){return copy().outcomes[key]||MODEL.outcomes[key].label}
+function translatedDoseTitle(dose){return copy().doseTitles[dose]||MODEL.dose_titles[dose]}
+function applyLanguage(){const c=copy();document.documentElement.lang=c.lang;document.title=c.title;el("pageTitle").textContent=c.pageTitle;el("pageSubtitle").textContent=c.subtitle;el("langToggle").textContent=c.toggle;el("langToggle").setAttribute("aria-label",currentLang==="zh"?"Switch to English":"切换到中文");const extra=extraCopy();el("brandKicker").textContent=extra.brandKicker;el("metaSample").textContent=extra.metaSample;el("metaModel").textContent=extra.metaModel;el("metaUse").textContent=extra.metaUse;document.querySelectorAll(".section-title").forEach((node,index)=>{if(c.sections[index])node.textContent=c.sections[index]});Object.entries(c.labels).forEach(([id,text])=>updateLabelForInput(id,text));Object.entries(c.selects).forEach(([id,labels])=>updateSelect(id,labels));document.querySelector(".small").textContent=c.small;document.querySelector(".warning").textContent=c.warning;document.querySelectorAll(".metric span").forEach((node,index)=>{if(c.metrics[index])node.textContent=c.metrics[index]});const chartTitles=document.querySelectorAll(".chart-title");if(chartTitles[0])chartTitles[0].textContent=c.charts.harm;if(chartTitles[1])chartTitles[1].textContent=c.charts.risk}const OUTCOME_KEYS=Object.keys(MODEL.outcomes);function sigmoid(x){return 1/(1+Math.exp(-Math.max(-30,Math.min(30,x))))}function pct(x,digits=1){return(100*x).toFixed(digits)+"%"}function el(id){return document.getElementById(id)}function setDefaults(){const d=MODEL.defaults;for(const [key,value] of Object.entries(d)){const node=el(key);if(!node)continue;if(node.type==="checkbox")node.checked=Number(value)===1;else node.value=value}}function readPatient(){const age=Number(el("age").value||MODEL.defaults.age);return{age:age,age_per10:age/10,age_ge75:age>=75?1:0,male:Number(el("male").value),race_group:el("race_group").value,lvef_phenotype_unknown:el("lvef_phenotype_unknown").value,sofa_score:Number(el("sofa_score").value||0),respiration:Number(el("respiration").value||0),lactate_max_around_vaso:Number(el("lactate_max_around_vaso").value||0),meanbp_min:Number(el("meanbp_min").value||0),heart_failure_icd:el("heart_failure_icd").checked?1:0,ckd_icd_history_through_hadm:el("ckd_icd_history_through_hadm").checked?1:0,copd_icd_history_through_hadm:el("copd_icd_history_through_hadm").checked?1:0,diabetes_icd_history_through_hadm:el("diabetes_icd_history_through_hadm").checked?1:0,cad_icd_history_through_hadm:el("cad_icd_history_through_hadm").checked?1:0,atrial_fibrillation_icd_history_through_hadm:el("atrial_fibrillation_icd_history_through_hadm").checked?1:0,hypoalbumin_lt3:el("hypoalbumin_lt3").checked?1:0,renal_vulnerability:el("renal_vulnerability").checked?1:0,echo_vulnerability_no_resp_high:el("echo_vulnerability_no_resp_high").checked?1:0}}function featureValue(name,patient,dose){if(name==="Intercept")return 1;if(name.startsWith("race__"))return patient.race_group===name.slice(6)?1:0;if(name.startsWith("lvef__"))return patient.lvef_phenotype_unknown===name.slice(6)?1:0;if(name.startsWith("dose__")){const parts=name.split("__x__");const dosePart=parts[0].slice(6);const doseVal=dose===dosePart?1:0;if(parts.length===1)return doseVal;return doseVal*Number(patient[parts[1]]||0)}return Number(patient[name]||0)}function predictFromCoef(coef,features,patient,dose){let lp=0;for(const f of features)lp+=(coef[f]||0)*featureValue(f,patient,dose);return sigmoid(lp)}function estimate(patient){const rows=[];const rawProp={};let propSum=0;for(const dose of MODEL.dose_labels){const p=predictFromCoef(MODEL.models.propensity[dose].coef,MODEL.models.propensity_features,patient,dose);rawProp[dose]=p;propSum+=p}for(const dose of MODEL.dose_labels){const risks={};let harm=0;for(const key of OUTCOME_KEYS){const r=predictFromCoef(MODEL.models.outcomes[key].coef,MODEL.models.outcome_features,patient,dose);risks[key]=r;harm+=MODEL.outcomes[key].weight*r}const support=rawProp[dose]/propSum;rows.push({dose,risks,harm,support,eligible:support>=MODEL.propensity_min})}let eligible=rows.filter(r=>r.eligible);let chosenPool=eligible.length?eligible:rows;chosenPool.sort((a,b)=>a.harm-b.harm);const chosen=chosenPool[0];const standard=rows.find(r=>r.dose==="30-45");return{rows,chosen,standard,restricted:eligible.length===0}}function renderHarmChart(rows,chosenDose){const width=620,height=210,left=54,bottom=36,top=16,right=20,plotW=width-left-right,plotH=height-top-bottom,max=Math.max(...rows.map(r=>r.harm),1.0)*1.08,barW=plotW/rows.length*.58;let svg=`<svg viewBox="0 0 ${width} ${height}">`;svg+=`<line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="#9aa4af"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="#9aa4af"/>`;rows.forEach((r,i)=>{const x=left+(i+.5)*plotW/rows.length,h=r.harm/max*plotH,y=height-bottom-h,color=COLORS[r.dose],stroke=r.dose===chosenDose?"#111827":"none";svg+=`<rect x="${x-barW/2}" y="${y}" width="${barW}" height="${h}" rx="5" fill="${color}" stroke="${stroke}" stroke-width="2"/><text x="${x}" y="${y-7}" text-anchor="middle" font-size="12" fill="#1f2933">${r.harm.toFixed(2)}</text><text x="${x}" y="${height-12}" text-anchor="middle" font-size="12" fill="#334155">${r.dose}</text>`});svg+=`<text x="12" y="${top+8}" font-size="11" fill="#64707d">${copy().charts.lower}</text></svg>`;el("harmChart").innerHTML=svg}function renderRiskChart(rows){const width=920,height=260,left=70,bottom=42,top=18,right=16,plotW=width-left-right,plotH=height-top-bottom,groupW=plotW/OUTCOME_KEYS.length,barW=groupW/(MODEL.dose_labels.length+1);let svg=`<svg viewBox="0 0 ${width} ${height}">`;for(let yv of[0,.25,.5,.75,1]){const y=height-bottom-yv*plotH;svg+=`<line x1="${left}" y1="${y}" x2="${width-right}" y2="${y}" stroke="#e5eaf0"/><text x="${left-10}" y="${y+4}" text-anchor="end" font-size="11" fill="#64707d">${Math.round(yv*100)}%</text>`}OUTCOME_KEYS.forEach((key,gi)=>{const gx=left+gi*groupW;MODEL.dose_labels.forEach((dose,di)=>{const row=rows.find(r=>r.dose===dose),val=row.risks[key],h=val*plotH,x=gx+20+di*barW,y=height-bottom-h;svg+=`<rect x="${x}" y="${y}" width="${barW*.72}" height="${h}" rx="3" fill="${COLORS[dose]}"/>`});svg+=`<text x="${gx+groupW/2}" y="${height-12}" text-anchor="middle" font-size="11" fill="#334155">${translatedOutcome(key)}</text>`});svg+=`</svg>`;el("riskChart").innerHTML=svg}function renderCards(rows,chosenDose){el("doseCards").innerHTML=rows.map(r=>{const border=COLORS[r.dose];const risks=OUTCOME_KEYS.map(key=>{const val=r.risks[key];return`<div class="risk"><div class="risk-row"><span>${translatedOutcome(key)}</span><strong>${pct(val)}</strong></div><div class="bar"><div class="fill" style="width:${Math.min(100,val*100)}%;background:${border}"></div></div></div>`}).join("");const c=copy();const mark=r.dose===chosenDose?c.marks.candidate:(r.eligible?c.marks.supported:c.marks.limited);return`<article class="panel dose-card ${r.dose===chosenDose?'is-chosen':''}" style="border-top-color:${border}"><h3>${translatedDoseTitle(r.dose)}</h3>${risks}<div class="support">${mark} | ${c.support} ${pct(r.support,1)} | ${c.harm} ${r.harm.toFixed(3)}</div></article>`}).join("")}function update(){const patient=readPatient(),result=estimate(patient),chosen=result.chosen,benefit=result.standard.harm-chosen.harm;applyLanguage();el("recTitle").textContent=translatedDoseTitle(chosen.dose);el("recHarm").textContent=chosen.harm.toFixed(3);el("benefit").textContent=(benefit*100).toFixed(1)+copy().benefitUnit;el("supportProb").textContent=pct(chosen.support,1);el("supportBadge").textContent=chosen.eligible?copy().supported:copy().limited;el("supportBadge").style.background=chosen.eligible?COLORS[chosen.dose]:"#b88746";el("recText").textContent=copy().recText((benefit*100).toFixed(1));renderHarmChart(result.rows,chosen.dose);renderRiskChart(result.rows);renderCards(result.rows,chosen.dose)}setDefaults();el("langToggle").addEventListener("click",()=>{currentLang=currentLang==="zh"?"en":"zh";localStorage.setItem("fluidCalcLang",currentLang);update()});document.querySelectorAll("input, select").forEach(node=>node.addEventListener("input",update));update();
+</script>
+</body></html>
