@@ -17,14 +17,10 @@ h1 { margin:0; font-size:24px; letter-spacing:0; }
 .subtitle { margin-top:7px; color:var(--muted); font-size:13px; line-height:1.45; max-width:1180px; }
 .notice { margin-top:10px; display:inline-block; padding:7px 10px; border:1px solid #ddb96a; background:#fff8e8; color:#6b4b14; border-radius:6px; font-size:12px; }
 .study-wrap { max-width:1500px; margin:0 auto; padding:14px 16px 0; }
-.studybar { display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:10px; }
+.studybar { display:grid; grid-template-columns:1fr; gap:10px; }
 .claim { padding:14px 15px; background:#102033; color:#fff; border-radius:8px; min-height:110px; }
 .claim .eyebrow { color:#b9d7db; font-size:11px; text-transform:uppercase; font-weight:700; }
 .claim strong { display:block; margin-top:8px; font-size:19px; line-height:1.22; }
-.evidence-card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px; min-height:110px; }
-.evidence-card span { display:block; color:var(--muted); font-size:11px; line-height:1.25; }
-.evidence-card strong { display:block; margin-top:6px; font-size:22px; }
-.evidence-card em { display:block; margin-top:6px; color:#334155; font-style:normal; font-size:11px; line-height:1.35; }
 .research-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
 .research-tab { border:1px solid var(--line); border-radius:8px; background:#fff; padding:11px 12px; }
 .research-tab b { display:block; font-size:12px; margin-bottom:4px; }
@@ -52,7 +48,6 @@ input[type=range] { padding:0; border:0; accent-color:var(--teal); }
 .metric { border:1px solid var(--line); border-radius:7px; padding:10px; min-height:75px; }
 .metric span { display:block; color:var(--muted); font-size:11px; line-height:1.3; }
 .metric strong { display:block; margin-top:5px; font-size:20px; }
-.twocol { display:grid; grid-template-columns:1.1fr .9fr; gap:14px; }
 .chart-panel { padding:14px; }
 .chart-title { font-weight:700; font-size:14px; margin-bottom:8px; }
 .chart-note { color:var(--muted); font-size:11px; line-height:1.45; margin-top:8px; }
@@ -83,7 +78,7 @@ table { width:100%; border-collapse:collapse; font-size:12px; }
 th,td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; vertical-align:top; }
 th { border-top:2px solid #111827; border-bottom:1px solid #111827; font-weight:700; }
 tr:last-child td { border-bottom:2px solid #111827; }
-@media(max-width:1120px) { .shell,.topgrid,.twocol,.footer-grid,.studybar,.research-tabs,.research-result-grid { grid-template-columns:1fr; } .inputs { position:static; } .dose-cards,.metrics { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:1120px) { .shell,.topgrid,.footer-grid,.studybar,.research-tabs,.research-result-grid { grid-template-columns:1fr; } .inputs { position:static; } .dose-cards,.metrics { grid-template-columns:repeat(2,1fr); } }
 @media(max-width:640px) { header { padding:15px; } .study-wrap,.shell { padding:10px; } .grid2,.dose-cards,.metrics { grid-template-columns:1fr; } .phenotype { font-size:23px; } .dose-controls { grid-template-columns:1fr; } .dose-value { text-align:left; } }
 </style>
 </head>
@@ -99,10 +94,6 @@ tr:last-child td { border-bottom:2px solid #111827; }
       <div class="eyebrow">Main message for investigators</div>
       <strong>After 30 mL/kg, the useful question is not "more fluid or not"; it is whether persistent need and fluid tolerance point to a monitored reassessment.</strong>
     </div>
-    <div class="evidence-card"><span>Eligible post-threshold hours</span><strong id="factHours">5915</strong><em>from strict Sepsis-3 septic shock stays</em></div>
-    <div class="evidence-card"><span>Active-comparator decisions</span><strong id="factActive">643</strong><em>fluid-first or vasopressor-first hours</em></div>
-    <div class="evidence-card"><span>Endpoint audit result</span><strong id="factAudit">P=0.350</strong><em>original fluid signal weakened after decoupling</em></div>
-    <div class="evidence-card"><span>External structure</span><strong id="factEicu">eICU</strong><em>risk gradient reproduced, treatment effect not claimed</em></div>
   </div>
   <div class="research-tabs">
     <div class="research-tab"><b>1. Why 30 mL/kg?</b><p>It creates a concrete post-guideline checkpoint where the next clinical action is uncertain and trial-ready.</p></div>
@@ -162,17 +153,10 @@ tr:last-child td { border-bottom:2px solid #111827; }
       </div>
     </div>
 
-    <div class="twocol">
-      <div class="panel chart-panel">
-        <div class="chart-title">Decision space: residual perfusion need x intolerance risk</div>
-        <div id="quadrantChart"></div>
-        <div class="chart-note">The dot moves with patient inputs. High need marks persistent shock physiology; high intolerance risk marks limited reserve. Neither axis alone proves fluid responsiveness.</div>
-      </div>
-      <div class="panel chart-panel">
-        <div class="chart-title">Endpoint audit: why the original result should not be over-read</div>
-        <div id="auditChart"></div>
-        <div class="chart-note">The original fluid-first signal weakened when the endpoint was decoupled from vasopressor de-escalation and when respiratory outcomes were temporally separated.</div>
-      </div>
+    <div class="panel chart-panel">
+      <div class="chart-title">Endpoint audit: why the original result should not be over-read</div>
+      <div id="auditChart"></div>
+      <div class="chart-note">The original fluid-first signal weakened when the endpoint was decoupled from vasopressor de-escalation and when respiratory outcomes were temporally separated.</div>
     </div>
 
     <div class="panel chart-panel">
@@ -265,36 +249,6 @@ function researchReads(ph) {
   };
   return map[ph];
 }
-function renderFacts() {
-  const flow = DATA.flow || [];
-  const eligible = flow.find(r => String(r.step || "").includes("Persistent need")) || {};
-  const active = flow.find(r => String(r.step || "").includes("Classified")) || {};
-  const fair = (DATA.main_effects || []).find(r => r.outcome === "shock_stabilization_6h_fair") || {};
-  const eicuN = (DATA.eicu || []).filter(r => String(r.dataset || "").startsWith("eICU")).reduce((a,b)=>a+Number(b.n || 0),0);
-  el("factHours").textContent = Number(eligible.n || 5915).toLocaleString();
-  el("factActive").textContent = Number(active.n || 643).toLocaleString();
-  el("factAudit").textContent = "P=" + (fair.p_formatted || (fair.p ? Number(fair.p).toFixed(3) : "0.350"));
-  el("factEicu").textContent = eicuN ? eicuN.toLocaleString() : "3,400";
-}
-function renderQuadrant(ph) {
-  const W=640,H=380,L=70,R=30,T=28,B=58;
-  const x = v => L + v/4*(W-L-R);
-  const y = v => H-B - v/7*(H-T-B);
-  const ns=needScore(), rs=riskScore();
-  let svg=`<svg viewBox="0 0 ${W} ${H}">`;
-  svg+=`<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="#fff" stroke="#9aa4af"/>`;
-  svg+=`<line x1="${x(2)}" y1="${T}" x2="${x(2)}" y2="${H-B}" stroke="#94a3b8" stroke-dasharray="5 4"/><line x1="${L}" y1="${y(3)}" x2="${W-R}" y2="${y(3)}" stroke="#94a3b8" stroke-dasharray="5 4"/>`;
-  const labels=[
-    [x(3),y(5.5),ORDER[0]],[x(3),y(1.4),ORDER[1]],[x(.75),y(5.5),ORDER[2]],[x(.8),y(1.4),ORDER[3]]
-  ];
-  labels.forEach(([xx,yy,label])=>{svg+=`<text x="${xx}" y="${yy}" text-anchor="middle" font-size="12" fill="${COLORS[label]}" font-weight="700">${label.replace(" / "," /\n")}</text>`;});
-  svg+=`<circle cx="${x(ns)}" cy="${y(rs)}" r="9" fill="${COLORS[ph]}" stroke="#111827" stroke-width="1.5"/>`;
-  svg+=`<text x="${W/2}" y="${H-16}" text-anchor="middle" font-size="12" fill="#334155">Residual perfusion need score</text>`;
-  svg+=`<text x="18" y="${H/2}" transform="rotate(-90 18 ${H/2})" text-anchor="middle" font-size="12" fill="#334155">Fluid-intolerance risk score</text>`;
-  svg+=`<text x="${x(ns)+12}" y="${y(rs)-12}" font-size="12" fill="#111827">current patient</text>`;
-  svg+=`</svg>`;
-  el("quadrantChart").innerHTML=svg;
-}
 function renderAudit() {
   const rows = DATA.main_effects;
   const hemo = rows.find(r=>r.outcome==="hemodynamic_response_6h") || {};
@@ -346,13 +300,11 @@ function render() {
   el("eicu").textContent = pct(eicu.death_pct);
   el("doseValue").textContent = `${Number(el("dose").value).toFixed(1)} mL/kg`;
   el("doseText").textContent = `Selected dose falls in the ${doseBin(Number(el("dose").value))} mL/kg interval. Candidate lower-risk interval in this phenotype: ${cand.candidate_range || "0-5"} mL/kg.`;
-  renderQuadrant(ph);
   renderAudit();
   renderDoseCards(ph);
   renderProfileTable(ph);
 }
 document.querySelectorAll("input, select").forEach(node => node.addEventListener("input", render));
-renderFacts();
 render();
 </script>
 </body>
