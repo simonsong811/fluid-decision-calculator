@@ -98,7 +98,7 @@ tr:last-child td { border-bottom:2px solid #111827; }
   <div class="research-tabs">
     <div class="research-tab"><b>1. Why 30 mL/kg?</b><p>It creates a concrete post-guideline checkpoint where the next clinical action is uncertain and trial-ready.</p></div>
     <div class="research-tab"><b>2. What changed after audit?</b><p>The appealing fluid-first signal was sensitive to endpoint coupling and time-window definition.</p></div>
-    <div class="research-tab"><b>3. What remains useful?</b><p>Four bedside phenotypes separate prognosis, tolerance risk and candidate response signals.</p></div>
+    <div class="research-tab"><b>3. What remains useful?</b><p>Four bedside phenotypes separate prognosis, tolerance risk and exploratory response estimates.</p></div>
   </div>
 </section>
 <main class="shell">
@@ -141,14 +141,14 @@ tr:last-child td { border-bottom:2px solid #111827; }
         </div>
         <div class="research-result-grid">
           <div class="result-tile"><strong id="researchRead1">-</strong><span>prognostic read</span></div>
-          <div class="result-tile"><strong id="researchRead2">-</strong><span>candidate treatment-response read</span></div>
+          <div class="result-tile"><strong id="researchRead2">-</strong><span>exploratory response estimate</span></div>
           <div class="result-tile"><strong id="researchRead3">-</strong><span>how to write it in the manuscript</span></div>
         </div>
       </div>
       <div class="panel metrics">
         <div class="metric"><span>MIMIC phenotype mortality</span><strong id="mortality">-</strong></div>
         <div class="metric"><span>6-h shock non-stabilization</span><strong id="nonstab">-</strong></div>
-        <div class="metric"><span>Candidate net favorable response</span><strong id="netrd">-</strong></div>
+        <div class="metric"><span>Exploratory net favorable response</span><strong id="netrd">-</strong></div>
         <div class="metric"><span>eICU mortality gradient</span><strong id="eicu">-</strong></div>
       </div>
     </div>
@@ -163,7 +163,7 @@ tr:last-child td { border-bottom:2px solid #111827; }
       <div class="dose-controls">
         <div>
           <div class="chart-title">Observed dose-range display after the 30 mL/kg checkpoint</div>
-          <div class="small">The 0-5 mL/kg band is shown as an observational candidate lower-risk range, not an optimal dose.</div>
+          <div class="small">The 0-5 mL/kg band contains the densest observed support in this dataset. It is not an optimal or recommended dose.</div>
         </div>
         <div class="dose-value" id="doseValue">2.5 mL/kg</div>
       </div>
@@ -245,7 +245,7 @@ function researchReads(ph) {
     [ORDER[0]]:["Poor stabilization environment","Fluid-unfavorable point estimate","High need ≠ fluid responsiveness"],
     [ORDER[1]]:["Persistent need with better reserve","Fluid-unfavorable point estimate","Need alone did not define benefit"],
     [ORDER[2]]:["Reserve-limited but lower current need","Indeterminate signal","Tolerance risk and need diverge"],
-    [ORDER[3]]:["Lower need and better reserve","Only fluid-favorable point estimate","Underpowered candidate signal"]
+    [ORDER[3]]:["Lower need and better reserve","Only fluid-favorable point estimate","Underpowered point estimate"]
   };
   return map[ph];
 }
@@ -299,7 +299,7 @@ function render() {
   el("netrd").textContent = `${Number(tx.net_favorable_rd_pctpt ?? 0).toFixed(1)} pp`;
   el("eicu").textContent = pct(eicu.death_pct);
   el("doseValue").textContent = `${Number(el("dose").value).toFixed(1)} mL/kg`;
-  el("doseText").textContent = `Selected dose falls in the ${doseBin(Number(el("dose").value))} mL/kg interval. Candidate lower-risk interval in this phenotype: ${cand.candidate_range || "0-5"} mL/kg.`;
+  el("doseText").textContent = `Selected dose falls in the ${doseBin(Number(el("dose").value))} mL/kg interval. Densest observed support in this phenotype: ${cand.candidate_range || "0-5"} mL/kg; this is not a treatment recommendation.`;
   renderAudit();
   renderDoseCards(ph);
   renderProfileTable(ph);
